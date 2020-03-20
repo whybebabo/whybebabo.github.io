@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>歪比巴卜的博客</title>
+    <link>https://whybebabo.github.io/</link>
+    <description>Recent content on 歪比巴卜的博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-CN</language>
+    <lastBuildDate>Fri, 20 Mar 2020 11:49:42 +0800</lastBuildDate>
+    
+	<atom:link href="https://whybebabo.github.io/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Test</title>
+      <link>https://whybebabo.github.io/post/test/</link>
+      <pubDate>Fri, 20 Mar 2020 11:49:42 +0800</pubDate>
+      
+      <guid>https://whybebabo.github.io/post/test/</guid>
+      <description>local test</description>
+    </item>
+    
+  </channel>
+</rss>
