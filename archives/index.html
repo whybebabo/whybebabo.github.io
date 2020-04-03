@@ -27,9 +27,7 @@
 
     
     
-        <link rel="stylesheet" href='/css/douban.css'>
-    
-        <link rel="stylesheet" href='/css/other.css'>
+        <link rel="stylesheet" href='/css/copy-to-clipboard.css'>
     
 </head>
 
@@ -72,8 +70,8 @@
     <ul class="listing">
         
         <li>
-            <span class="date">2020/03/20</span>
-            <a href="https://whybebabo.github.io/post/test/" title="Test">Test</a>
+            <span class="date">2020/04/02</span>
+            <a href="https://whybebabo.github.io/post/2020-04-02-%E5%8F%8D%E6%B1%87%E7%BC%96%E7%9C%8B%E7%BC%96%E8%AF%91%E5%99%A8%E5%AF%B9%E5%B8%B8%E9%87%8F%E7%9A%84%E5%A4%84%E7%90%86/" title="反汇编看编译器对常量的处理">反汇编看编译器对常量的处理</a>
         </li>
         
     </ul>
@@ -98,7 +96,7 @@
 <ul class="widget-list">
     
     <li>
-        <a href="https://whybebabo.github.io/post/test/" title="Test">Test</a>
+        <a href="https://whybebabo.github.io/post/2020-04-02-%E5%8F%8D%E6%B1%87%E7%BC%96%E7%9C%8B%E7%BC%96%E8%AF%91%E5%99%A8%E5%AF%B9%E5%B8%B8%E9%87%8F%E7%9A%84%E5%A4%84%E7%90%86/" title="反汇编看编译器对常量的处理">反汇编看编译器对常量的处理</a>
     </li>
     
 </ul>
@@ -110,7 +108,7 @@
         <h3 class="widget-title">分类</h3>
 <ul class="widget-list">
     
-    <li><a href="https://whybebabo.github.io/categories/Test/">Test (1)</a></li>
+    <li><a href="https://whybebabo.github.io/categories/C&#43;&#43;/">C&#43;&#43; (1)</a></li>
     
 </ul>
     </section>
@@ -145,7 +143,31 @@
 
 
     
-    <script type="text/javascript">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/webfont/1.6.28/webfontloader.js" crossorigin="anonymous"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/snap.svg/0.5.1/snap.svg-min.js" crossorigin="anonymous"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.9.1/underscore-min.js" crossorigin="anonymous"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/js-sequence-diagrams/1.0.6/sequence-diagram-min.js" crossorigin="anonymous"></script>
+        <script>(function () {
+            if (!window.Diagram) return;
+            const blocks = document.querySelectorAll('pre code.language-sequence');
+            for (let i = 0; i < blocks.length; i++) {
+                const block = blocks[i];
+                
+                const rootElement = block.parentNode;
+                const container = document.createElement('div');
+                const id = `js-sequence-diag-${i}`;
+                container.id = id;
+                container.className = 'align-center';
+                container.setAttribute("style", "overFlow-x:auto");
+                rootElement.parentNode.replaceChild(container, rootElement);
+
+                const diagram = Diagram.parse(block.childNodes[0].nodeValue);
+                diagram.drawSVG(id, window.sequenceDiagramsOptions
+                    ? window.sequenceDiagramsOptions
+                    : { theme: 'simple' });
+            }
+        })();
+        </script><script type="text/javascript">
         window.MathJax = {
             tex2jax: {
                 inlineMath: [['$', '$']],
@@ -168,6 +190,7 @@
 
     <script src='/js/douban.js'></script>
 
+<script src="/js/copy-to-clipboard.js"></script>
 </body>
 
 </html>

@@ -25,9 +25,7 @@
 
     
     
-        <link rel="stylesheet" href='/css/douban.css'>
-    
-        <link rel="stylesheet" href='/css/other.css'>
+        <link rel="stylesheet" href='/css/copy-to-clipboard.css'>
     
 </head>
 
@@ -71,24 +69,24 @@
     <article class="post">
         <header>
             <h1 class="post-title">
-                <a href="https://whybebabo.github.io/post/test/" title="Test">Test</a>
+                <a href="https://whybebabo.github.io/post/2020-04-02-%E5%8F%8D%E6%B1%87%E7%BC%96%E7%9C%8B%E7%BC%96%E8%AF%91%E5%99%A8%E5%AF%B9%E5%B8%B8%E9%87%8F%E7%9A%84%E5%A4%84%E7%90%86/" title="反汇编看编译器对常量的处理">反汇编看编译器对常量的处理</a>
             </h1>
         </header>
         <date class="post-meta meta-date">
-            2020年3月20日
+            2020年4月2日
         </date>
         
         <div class="post-meta">
             <span>|</span>
             
-            <span class="meta-category"><a href='https://whybebabo.github.io/categories/Test'>Test</a></span>
+            <span class="meta-category"><a href='https://whybebabo.github.io/categories/C&#43;&#43;'>C&#43;&#43;</a></span>
             
         </div>
         
         <div class="post-content">
-            test……
+            1. 编译器对常量的处理 话不多说，直接上代码 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 #include &lt;stdio.h&gt; #define MARCO_INT 1 const int gconst_int = 3; int main() { const int const_int = 2; // &#34;伪&#34;常量，可以取址改变变量 int i1 = MARCO_INT + 10; // 1+10=11 int i2 = const_int + 2; // 2+2=4 int i3 = gconst_int + 3; // 3+3=6 // int* gp = const_cast&lt;int *&gt;(&amp;gconst_int); // 会导致段错误，不能改变rodata处的值 int* p = const_cast&lt;int *&gt;(&amp;const_int); //强制……
         </div>
-        <p class="readmore"><a href="https://whybebabo.github.io/post/test/">阅读全文</a></p>
+        <p class="readmore"><a href="https://whybebabo.github.io/post/2020-04-02-%E5%8F%8D%E6%B1%87%E7%BC%96%E7%9C%8B%E7%BC%96%E8%AF%91%E5%99%A8%E5%AF%B9%E5%B8%B8%E9%87%8F%E7%9A%84%E5%A4%84%E7%90%86/">阅读全文</a></p>
     </article>
     
     
@@ -116,7 +114,7 @@
 <ul class="widget-list">
     
     <li>
-        <a href="https://whybebabo.github.io/post/test/" title="Test">Test</a>
+        <a href="https://whybebabo.github.io/post/2020-04-02-%E5%8F%8D%E6%B1%87%E7%BC%96%E7%9C%8B%E7%BC%96%E8%AF%91%E5%99%A8%E5%AF%B9%E5%B8%B8%E9%87%8F%E7%9A%84%E5%A4%84%E7%90%86/" title="反汇编看编译器对常量的处理">反汇编看编译器对常量的处理</a>
     </li>
     
 </ul>
@@ -128,7 +126,7 @@
         <h3 class="widget-title">分类</h3>
 <ul class="widget-list">
     
-    <li><a href="https://whybebabo.github.io/categories/Test/">Test (1)</a></li>
+    <li><a href="https://whybebabo.github.io/categories/C&#43;&#43;/">C&#43;&#43; (1)</a></li>
     
 </ul>
     </section>
@@ -175,6 +173,7 @@
 
     <script src='/js/douban.js'></script>
 
+<script src="/js/copy-to-clipboard.js"></script>
 </body>
 
 </html>
