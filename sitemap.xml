@@ -3,16 +3,6 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>https://whybebabo.github.io/post/</loc>
-    <lastmod>2020-04-12T00:46:07+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://whybebabo.github.io/post/team_test/</loc>
-    <lastmod>2020-04-12T00:46:07+08:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://whybebabo.github.io/tags/C&#43;&#43;/</loc>
     <lastmod>2020-04-02T17:44:52+08:00</lastmod>
   </url>
@@ -24,6 +14,11 @@
   
   <url>
     <loc>https://whybebabo.github.io/categories/</loc>
+    <lastmod>2020-04-02T17:44:52+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://whybebabo.github.io/post/</loc>
     <lastmod>2020-04-02T17:44:52+08:00</lastmod>
   </url>
   
