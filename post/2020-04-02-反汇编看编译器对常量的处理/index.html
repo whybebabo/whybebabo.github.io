@@ -6,8 +6,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>反汇编看编译器对常量的处理 | 歪比巴卜的博客</title>
-    <meta property="og:title" content="反汇编看编译器对常量的处理 - 歪比巴卜的博客">
+    <title>编译器对宏、常量的处理 | 歪比巴卜的博客</title>
+    <meta property="og:title" content="编译器对宏、常量的处理 - 歪比巴卜的博客">
     <meta property="og:type" content="article">
         
     <meta property="article:published_time" content='2020-04-02T17:44:52&#43;08:00'>
@@ -16,7 +16,7 @@
     <meta property="article:modified_time" content='2020-04-02T17:44:52&#43;08:00'>
         
     <meta name="Keywords" content="">
-    <meta name="description" content="反汇编看编译器对常量的处理">
+    <meta name="description" content="编译器对宏、常量的处理">
         
     <meta name="author" content="歪比巴卜">
     <meta property="og:url" content="https://whybebabo.github.io/post/2020-04-02-%E5%8F%8D%E6%B1%87%E7%BC%96%E7%9C%8B%E7%BC%96%E8%AF%91%E5%99%A8%E5%AF%B9%E5%B8%B8%E9%87%8F%E7%9A%84%E5%A4%84%E7%90%86/">
@@ -135,8 +135,10 @@
     <div class="post-toc-content">
         <nav id="TableOfContents">
   <ul>
-    <li><a href="#1-编译器对常量的处理">1. 编译器对常量的处理</a></li>
-    <li><a href="#2-安全的const_cast">2. 安全的const_cast</a></li>
+    <li><a href="#1-简述编译流程">1. 简述编译流程</a></li>
+    <li><a href="#2-预处理阶段">2. 预处理阶段</a></li>
+    <li><a href="#3-编译阶段">3. 编译阶段</a></li>
+    <li><a href="#4-安全的const_cast">4. 安全的const_cast</a></li>
   </ul>
 </nav>
     </div>
@@ -170,7 +172,7 @@
 </script>
     <article class="post">
         <header>
-            <h1 class="post-title">反汇编看编译器对常量的处理</h1>
+            <h1 class="post-title">编译器对宏、常量的处理</h1>
         </header>
         <date class="post-meta meta-date">
             2020年4月2日
@@ -197,8 +199,25 @@
         </div>
         
         <div class="post-content">
-            <h2 id="1-编译器对常量的处理">1. 编译器对常量的处理</h2>
-<p>话不多说，直接上代码</p>
+            <h2 id="1-简述编译流程">1. 简述编译流程</h2>
+<p>编译一个C程序主要分为以下四个阶段：</p>
+<ol>
+<li>预处理阶段，将源代码 .c 文件预处理后，生成 .i 文件；</li>
+<li>编译阶段，将 .i 文件编译成汇编语言，生成 .s 文件；</li>
+<li>汇编阶段，将汇编代码翻译为机器码指令，生成 .o 文件，.o 文件为二进制文件；</li>
+<li>链接阶段，将各个目标代码 .o 文件及库代码文件进行连接，打包成可执行文件。</li>
+</ol>
+<p><img src="D:%5Chugo%5Csites%5Cblog%5Ccontent%5Cpost%5C%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B.png" alt=""></p>
+<p>本文主要探究预处理阶段和编译阶段，编译器对程序代码的处理及优化</p>
+<h2 id="2-预处理阶段">2. 预处理阶段</h2>
+<p>一般来说，预处理阶段主要完成的是以下几个任务：</p>
+<ol>
+<li>#ifdef 等条件内容的替换；</li>
+<li>#include 内容，将对应的头文件拷贝到源文件中；</li>
+<li>#define 内容，不会安全检查，直接替换对应的文字内容。</li>
+</ol>
+<p>不同编译器处理可能有所区别，以下结果为 gcc 7.5.0 版本在 ubuntu 18.04系统下编译所得。</p>
+<p>首先在编译时定义三种变量，一个宏<code>MARCO_INT</code>，一个全局常量<code>gconst_int</code>和一个局部常量<code>const_int</code>。</p>
 <div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
 <table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
 <pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
@@ -220,22 +239,24 @@
 </span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
 </span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
 </span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
 </span></code></pre></td>
 <td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++"><span style="color:#999;font-weight:bold;font-style:italic">#include</span> <span style="color:#999;font-weight:bold;font-style:italic">&lt;stdio.h&gt;</span><span style="color:#999;font-weight:bold;font-style:italic">
+<pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++"><span style="color:#998;font-style:italic">// test.cpp
+</span><span style="color:#998;font-style:italic"></span><span style="color:#999;font-weight:bold;font-style:italic">#include</span> <span style="color:#999;font-weight:bold;font-style:italic">&lt;stdio.h&gt;</span><span style="color:#999;font-weight:bold;font-style:italic">
 </span><span style="color:#999;font-weight:bold;font-style:italic"></span>
 <span style="color:#999;font-weight:bold;font-style:italic">#define MARCO_INT 1
 </span><span style="color:#999;font-weight:bold;font-style:italic"></span><span style="color:#000;font-weight:bold">const</span> <span style="color:#458;font-weight:bold">int</span> gconst_int <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">3</span>;
 
 <span style="color:#458;font-weight:bold">int</span> <span style="color:#900;font-weight:bold">main</span>()
 {
-	<span style="color:#000;font-weight:bold">const</span> <span style="color:#458;font-weight:bold">int</span> const_int <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">2</span>;		<span style="color:#998;font-style:italic">// &#34;伪&#34;常量，可以取址改变变量
+	<span style="color:#000;font-weight:bold">const</span> <span style="color:#458;font-weight:bold">int</span> const_int <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">2</span>;		<span style="color:#998;font-style:italic">// &#34;伪&#34;常量，可以取址改变常量值
 </span><span style="color:#998;font-style:italic"></span>	<span style="color:#458;font-weight:bold">int</span> i1 <span style="color:#000;font-weight:bold">=</span> MARCO_INT <span style="color:#000;font-weight:bold">+</span> <span style="color:#099">10</span>;		<span style="color:#998;font-style:italic">// 1+10=11
 </span><span style="color:#998;font-style:italic"></span>	<span style="color:#458;font-weight:bold">int</span> i2 <span style="color:#000;font-weight:bold">=</span> const_int <span style="color:#000;font-weight:bold">+</span> <span style="color:#099">2</span>;			<span style="color:#998;font-style:italic">// 2+2=4
 </span><span style="color:#998;font-style:italic"></span>	<span style="color:#458;font-weight:bold">int</span> i3 <span style="color:#000;font-weight:bold">=</span> gconst_int <span style="color:#000;font-weight:bold">+</span> <span style="color:#099">3</span>;		<span style="color:#998;font-style:italic">// 3+3=6
 </span><span style="color:#998;font-style:italic"></span>	<span style="color:#998;font-style:italic">// int* gp = const_cast&lt;int *&gt;(&amp;gconst_int);	// 会导致段错误，不能改变rodata处的值
 </span><span style="color:#998;font-style:italic"></span>	<span style="color:#458;font-weight:bold">int</span><span style="color:#000;font-weight:bold">*</span> p <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">const_cast</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#458;font-weight:bold">int</span> <span style="color:#000;font-weight:bold">*&gt;</span>(<span style="color:#000;font-weight:bold">&amp;</span>const_int);		<span style="color:#998;font-style:italic">//强制转换获取常量的地址
-</span><span style="color:#998;font-style:italic"></span>	<span style="color:#000;font-weight:bold">*</span>p <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">30</span>;						<span style="color:#998;font-style:italic">//改变常量的值
+</span><span style="color:#998;font-style:italic"></span>	<span style="color:#000;font-weight:bold">*</span>p <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">30</span>;						<span style="color:#998;font-style:italic">//改变局部常量的值
 </span><span style="color:#998;font-style:italic"></span>	<span style="color:#458;font-weight:bold">int</span> i4 <span style="color:#000;font-weight:bold">=</span> const_int <span style="color:#000;font-weight:bold">+</span> <span style="color:#099">30</span>;		<span style="color:#998;font-style:italic">// 2+30=32
 </span><span style="color:#998;font-style:italic"></span>	printf(<span style="color:#d14">&#34;i1:%d, i2:%d, *p:%d, i3:%d, i4:%d</span><span style="color:#d14">\n</span><span style="color:#d14">&#34;</span>,
 				i1, i2, <span style="color:#000;font-weight:bold">*</span>p, i3, i4);	<span style="color:#998;font-style:italic">// i1:11, i2:4, *p:30, i3:6, i4:32
@@ -243,7 +264,70 @@
 }
 </code></pre></td></tr></table>
 </div>
-</div><p>以上定义了一个宏<code>MARCO_INT</code>，一个全局常量<code>gconst_int</code>和一个局部常量<code>const_int</code>，可以发现第15行处，虽然已经通过强制转换改变了局部变量<code>const_int</code>的值为30，但i4的赋值结果仍然为34，而非60。下面通过反汇编得到的代码，可以看到编译器对全局变量、局部变量、宏的处理。</p>
+</div><p>对 test.cpp 预处理得到对应的 test.i 文件</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">g++ -E test.cpp -o test.i
+</code></pre></td></tr></table>
+</div>
+</div><p>由于引入 stdio.h 头文件，在预处理时将该头文件内容拷贝到 test.i 文件中，会导致文件较大，故以下为截取的main函数部分：</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++"><span style="color:#998;font-style:italic">// test.i
+</span><span style="color:#998;font-style:italic"></span><span style="color:#999;font-weight:bold;font-style:italic"># 5 &#34;test.cpp&#34;
+</span><span style="color:#999;font-weight:bold;font-style:italic"></span><span style="color:#000;font-weight:bold">const</span> <span style="color:#458;font-weight:bold">int</span> gconst_int <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">3</span>;
+
+<span style="color:#458;font-weight:bold">int</span> <span style="color:#900;font-weight:bold">main</span>()
+{
+ <span style="color:#000;font-weight:bold">const</span> <span style="color:#458;font-weight:bold">int</span> const_int <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">2</span>;
+ <span style="color:#458;font-weight:bold">int</span> i1 <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">1</span> <span style="color:#000;font-weight:bold">+</span> <span style="color:#099">10</span>;
+ <span style="color:#458;font-weight:bold">int</span> i2 <span style="color:#000;font-weight:bold">=</span> const_int <span style="color:#000;font-weight:bold">+</span> <span style="color:#099">2</span>;
+ <span style="color:#458;font-weight:bold">int</span> i3 <span style="color:#000;font-weight:bold">=</span> gconst_int <span style="color:#000;font-weight:bold">+</span> <span style="color:#099">3</span>;
+
+ <span style="color:#458;font-weight:bold">int</span><span style="color:#000;font-weight:bold">*</span> p <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">const_cast</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#458;font-weight:bold">int</span> <span style="color:#000;font-weight:bold">*&gt;</span>(<span style="color:#000;font-weight:bold">&amp;</span>const_int);
+ <span style="color:#000;font-weight:bold">*</span>p <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">30</span>;
+ <span style="color:#458;font-weight:bold">int</span> i4 <span style="color:#000;font-weight:bold">=</span> const_int <span style="color:#000;font-weight:bold">+</span> <span style="color:#099">30</span>;
+ printf(<span style="color:#d14">&#34;i1:%d, i2:%d, *p:%d, i3:%d, i4:%d</span><span style="color:#d14">\n</span><span style="color:#d14">&#34;</span>,
+    i1, i2, <span style="color:#000;font-weight:bold">*</span>p, i3, i4);
+ <span style="color:#000;font-weight:bold">return</span> <span style="color:#099">0</span>;
+}
+</code></pre></td></tr></table>
+</div>
+</div><p>从 test.i 中可以发现，宏已经被直接替换为对应的数值了，而局部常量和全局常量并没有变换。</p>
+<h2 id="3-编译阶段">3. 编译阶段</h2>
+<p>继续对 test.i 文件编译得到 test.s 文件</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">g++ -S test.i -o test.s
+</code></pre></td></tr></table>
+</div>
+</div><p>以下为汇编后得到的代码</p>
 <div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
 <table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
 <pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
@@ -309,7 +393,7 @@
 </span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">61
 </span></code></pre></td>
 <td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">	.file	&#34;test7.cpp&#34;
+<pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">	.file	&#34;test.cpp&#34;
 	.text
 	.section	.rodata
 	.align 4
@@ -373,11 +457,12 @@ main:
 </code></pre></td></tr></table>
 </div>
 </div><ol>
-<li>从第7~9行与第27行，可以看到编译器对全局常量和局部常量的不同处理，全局常量位于rodata(readonlydata)区域，试图以任意方式修改rodata都会导致异常，而局部常量则不在该区域，可以通过强制转换来获得指针后进行修改；</li>
-<li>从28到30行，可以看到，编译器对宏、全局常量、局部常量的处理相同，在代码成为机器指令前，已经求得表达式的结果并得到立即数，在运行是直接赋给相应的变量，因此会出现i4=32而非60的情况。</li>
+<li>从第7~9行与第27行，可以看到编译器对全局常量和局部常量的不同处理，全局常量位于rodata区域，试图以任意方式修改rodata都会导致异常，而局部常量则不在该区域，可以通过强制转换获得指针后进行修改；</li>
+<li>从28到30行，可以看到，编译器对全局常量、局部常量的优化处理，在汇编阶段前，已经求得全局常量、局部常量的结果并得到立即数，在运行时直接赋给相应的变量，因此会出现<code>i4</code>值为32而非60的情况；</li>
+<li>同时可以看到使用常量与宏相比，在效率上没有什么差别，实际使用时如非其他需要，更推荐使用更为安全的常量。</li>
 </ol>
-<h2 id="2-安全的const_cast">2. 安全的const_cast</h2>
-<p>应该注意的是：上述中对于const常量进行const_cast操作是危险的。以下引用自C++03标准：</p>
+<h2 id="4-安全的const_cast">4. 安全的const_cast</h2>
+<p>应该注意的是：无论是全局常量还是局部常量，对于const常量进行const_cast操作是危险的。以下内容引用自C++03标准：</p>
 <blockquote>
 <p>Except that any class member declared mutable (7.1.1) can be modified, any attempt to modify a const object during its lifetime (3.8) results in undefined behavior</p>
 </blockquote>
@@ -496,7 +581,7 @@ main:
 <ul class="widget-list">
     
     <li>
-        <a href="https://whybebabo.github.io/post/2020-04-02-%E5%8F%8D%E6%B1%87%E7%BC%96%E7%9C%8B%E7%BC%96%E8%AF%91%E5%99%A8%E5%AF%B9%E5%B8%B8%E9%87%8F%E7%9A%84%E5%A4%84%E7%90%86/" title="反汇编看编译器对常量的处理">反汇编看编译器对常量的处理</a>
+        <a href="https://whybebabo.github.io/post/2020-04-02-%E5%8F%8D%E6%B1%87%E7%BC%96%E7%9C%8B%E7%BC%96%E8%AF%91%E5%99%A8%E5%AF%B9%E5%B8%B8%E9%87%8F%E7%9A%84%E5%A4%84%E7%90%86/" title="编译器对宏、常量的处理">编译器对宏、常量的处理</a>
     </li>
     
 </ul>

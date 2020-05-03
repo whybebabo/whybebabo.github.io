@@ -78,7 +78,7 @@
     <article class="post">
         <header>
             <h1 class="post-title">
-                <a href="https://whybebabo.github.io/post/2020-04-02-%E5%8F%8D%E6%B1%87%E7%BC%96%E7%9C%8B%E7%BC%96%E8%AF%91%E5%99%A8%E5%AF%B9%E5%B8%B8%E9%87%8F%E7%9A%84%E5%A4%84%E7%90%86/">反汇编看编译器对常量的处理</a>
+                <a href="https://whybebabo.github.io/post/2020-04-02-%E5%8F%8D%E6%B1%87%E7%BC%96%E7%9C%8B%E7%BC%96%E8%AF%91%E5%99%A8%E5%AF%B9%E5%B8%B8%E9%87%8F%E7%9A%84%E5%A4%84%E7%90%86/">编译器对宏、常量的处理</a>
             </h1>
         </header>
         <date class="post-meta meta-date">
@@ -93,7 +93,7 @@
         </div>
         
         <div class="post-content">
-            1. 编译器对常量的处理 话不多说，直接上代码 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 #include &lt;stdio.h&gt; #define MARCO_INT 1 const int gconst_int = 3; int main() { const int const_int = 2; // &#34;伪&#34;常量，可以取址改变变量 int i1 = MARCO_INT + 10; // 1+10=11 int i2 = const_int + 2; // 2+2=4 int i3 = gconst_int + 3; // 3+3=6 // int* gp = const_cast&lt;int *&gt;(&amp;gconst_int); // 会导致段错误，不能改变rodata处的值 int* p = const_cast&lt;int *&gt;(&amp;const_int); //强制……
+            1. 简述编译流程 编译一个C程序主要分为以下四个阶段： 预处理阶段，将源代码 .c 文件预处理后，生成 .i 文件； 编译阶段，将 .i 文件编译成汇编语言，生成 .s 文件； 汇编阶段，将汇编代码翻译为机器码指令，生成 .o 文件，.o 文件为二进制文件； 链接阶段，将各个目标代码 .o 文件及库代码文件进行连接，打包成可执行……
             <p class="readmore"><a href="https://whybebabo.github.io/post/2020-04-02-%E5%8F%8D%E6%B1%87%E7%BC%96%E7%9C%8B%E7%BC%96%E8%AF%91%E5%99%A8%E5%AF%B9%E5%B8%B8%E9%87%8F%E7%9A%84%E5%A4%84%E7%90%86/">阅读全文</a></p>
         </div>
     </article>
@@ -124,7 +124,7 @@
 <ul class="widget-list">
     
     <li>
-        <a href="https://whybebabo.github.io/post/2020-04-02-%E5%8F%8D%E6%B1%87%E7%BC%96%E7%9C%8B%E7%BC%96%E8%AF%91%E5%99%A8%E5%AF%B9%E5%B8%B8%E9%87%8F%E7%9A%84%E5%A4%84%E7%90%86/" title="反汇编看编译器对常量的处理">反汇编看编译器对常量的处理</a>
+        <a href="https://whybebabo.github.io/post/2020-04-02-%E5%8F%8D%E6%B1%87%E7%BC%96%E7%9C%8B%E7%BC%96%E8%AF%91%E5%99%A8%E5%AF%B9%E5%B8%B8%E9%87%8F%E7%9A%84%E5%A4%84%E7%90%86/" title="编译器对宏、常量的处理">编译器对宏、常量的处理</a>
     </li>
     
 </ul>
